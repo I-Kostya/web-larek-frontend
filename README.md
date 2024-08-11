@@ -85,6 +85,7 @@ interface IOrderForm {
 	address: string;
 	email: string;
 	phone: string;
+  total: number;
 }
 ```
 
@@ -101,7 +102,6 @@ interface IOrder extends IOrderForm {
 ```ts
 interface IOrderResult {
   id: string;
-  total: number;
 }
 ```
 
@@ -144,7 +144,7 @@ type TContactsForm = Pick<IOrderForm, 'email' | 'phone'>;
 Тип ошибки заказа
 
 ```ts
-export type FormErrors = Partial<Record<keyof IOrder, string>>;
+type FormErrors = Partial<Record<keyof IOrder, string>>;
 ```
 
 ## Архитектура приложения
@@ -208,10 +208,36 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 ### Слой данных
 
+#### Класс `LarekApi`
+
+Основной класс для работы с сервером в проекте.\
+Расширяет базовый класс `Api` по интерфейсу `ILarekAPI`.
+
+```ts
+interface ILarekAPI {
+  getProductList: () => Promise<IProduct[]>
+  orderProducts: (order: IOrder) => Promise<IOrderResult>
+}
+```
+
+Поля класса:
+
+- cdn - хранит входящий url
+
+Конструктор:
+
+- принимает и передает в родительский конструктор Api поля baseUrl и options
+- принимает и сохраняет входящий url запроса в cdn
+
+Методы:
+
+- getProductList — метод получения списка товаров с сервера
+- orderProducts — метод отправки данных заказа на сервер
+
 #### Класс ProductItem
 
 Принимает и хранит в себе данные товара: идентификатор, заголовок, описание, категория, изображение, цена.\
-Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IProduct`
+Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IProduct`.
 
 Поля класса:
 
@@ -226,12 +252,11 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс AppState
 
 Содержит в себе все основные группы данных страницы и методы работы с ними.\
-Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IAppState`
+Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IAppState`.
 
 Поля класса:
 
 - `_catalog` - для данных списка товаров
-- `_preview` - для данных товара в предпросмотре
 - `_basket` - для данных корзины покупок
 - `_order` - для данных заказа, который отправляется на сервер
 
@@ -240,11 +265,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 - `clearBasket` - очистить данные корзины
 - `addProductToBusket` - добавить продукт в корзину
 - `removeProductFromBusket` - убрать один продукт из корзины
-- `set catalog` - установить данные в каталог
-- `set preview` - установить данные в превью
 - `get total` - получить финальную сумму заказа
-- `set total` - установить финальную сумму заказа
-- `set order` - установить поле заказа
 - `get basket` - получить данные из корзины
 - `validateOrderAddress` - провести валидацию данных адреса заказа
 - `validateOrderContacts` - провести валидацию данных контактов заказа
@@ -256,7 +277,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Page
 
 Класс отвечает за отображение всех элементов страницы: корзины, счетчика корзины, каталога товаров.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IProductsList`.
 
 Поля класса:
 
@@ -279,7 +300,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Card
 
 Класс отвечает за отображение данных карточки товара в каталоге.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IProduct`.
 
 Поля:
 
@@ -289,7 +310,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 - `_price` - хранит разметку цены карточки
 
 Конструктор:
-- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`
+- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`.
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
 - вешает слушатель клика
@@ -305,7 +326,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс CardPreview
 
 Класс отображает превью выбранного товара.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по типу `TPreviewItem`.
 
 Поля:
 
@@ -313,7 +334,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 - `_description` - хранит разметку описания
 
 Конструктор:
-- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`
+- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`.
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
 - вешает слушатель клика
@@ -325,7 +346,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс CardBasket
 
 Класс отвечает за отображение данных товара в корзине.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по типу `TBasketItem`.
 
 Поля:
 
@@ -335,7 +356,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 Конструктор:
 
-- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`
+- принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`.
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
 - вешает слушатель клика
@@ -349,7 +370,13 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Modal
 
 Принимает разметку модального окна, отвечает за отображение содержимого таких элементов (модальных окон).\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IModalData`.
+
+```ts
+interface IModalData {
+	content:HTMLElement;
+}
+```
 
 Поля:
 
@@ -373,7 +400,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Basket
 
 Класс отвечает за отображение корзины: кнопки сабмита, полной стоимости.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по типу `TBasketItem`.
 
 Поля:
 
@@ -397,7 +424,14 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Form
 
 Класс отвечает за обертку форм с данными, работу с ними.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IForm`.
+
+```ts
+interface IForm {
+	errors:string[];
+	valid:boolean;
+}
+```
 
 Поля:
 
@@ -457,7 +491,13 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 #### Класс Success
 
 Класс нужен для отображения данных успешного заказа.\
-Расширяет базовый абстрактный класс `Component<T>`
+Расширяет базовый абстрактный класс `Component<T>` по интерфесу `ISuccess`
+
+```ts
+interface ISuccess {
+	total:string | number;
+}
+```
 
 Поля:
 - `_total` - разметка общей суммы товаров 
