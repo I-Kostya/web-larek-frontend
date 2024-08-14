@@ -3,11 +3,13 @@
 Стек: HTML, SCSS, TS, Webpack
 
 Структура проекта:
+
 - src/ — исходные файлы проекта
 - src/components/ — папка с JS компонентами
 - src/components/base/ — папка с базовым кодом
 
 Важные файлы:
+
 - src/pages/index.html — HTML-файл главной страницы
 - src/types/index.ts — файл с типами
 - src/index.ts — точка входа приложения
@@ -16,6 +18,7 @@
 - src/utils/utils.ts — файл с утилитами
 
 ## Установка и запуск
+
 Для установки и запуска проекта необходимо выполнить команды
 
 ```
@@ -29,6 +32,7 @@ npm run start
 yarn
 yarn start
 ```
+
 ## Сборка
 
 ```
@@ -47,12 +51,12 @@ yarn build
 
 ```ts
 interface IProduct {
-  _id: string;
-  title: string;
-  description: string;
-  category: TCategory;
-  image: string;
-  price: number | null;
+	_id: string;
+	title: string;
+	description: string;
+	category: string;
+	image: string;
+	price: number | null;
 }
 ```
 
@@ -60,7 +64,7 @@ interface IProduct {
 
 ```ts
 interface IProductsList {
-  products: IProductItem[];
+	products: IProductItem[];
 }
 ```
 
@@ -69,11 +73,11 @@ interface IProductsList {
 ```ts
 interface IAppState {
 	catalog: IProduct[];
-  basket: string[];
+	basket: string[];
 	preview: string | null;
-  order: IOrder;
-  total: string | number;
-  loading: boolean;
+	order: IOrder;
+	total: string | number;
+	loading: boolean;
 }
 ```
 
@@ -85,7 +89,7 @@ interface IOrderForm {
 	address: string;
 	email: string;
 	phone: string;
-  total: number;
+	total: number;
 }
 ```
 
@@ -93,7 +97,7 @@ interface IOrderForm {
 
 ```ts
 interface IOrder extends IOrderForm {
-  items: string[];
+	items: string[];
 }
 ```
 
@@ -101,20 +105,25 @@ interface IOrder extends IOrderForm {
 
 ```ts
 interface IOrderResult {
-  id: string;
+	id: string;
 }
 ```
 
 Тип категорий продуктов
 
 ```ts
-type TCategory = | 'софт-скил' | 'другое' | 'дополнительное' | 'кнопка' | 'хард-скил';
+type TCategory =
+	| 'софт-скил'
+	| 'другое'
+	| 'дополнительное'
+	| 'кнопка'
+	| 'хард-скил';
 ```
 
 Тип данных, находящихся в корзине
 
 ```ts
-type TBasketItem = Pick<IProduct, 'title' | 'price'>;
+type TBasketItem = Pick<IProduct, 'title' | 'price' | 'id'>;
 ```
 
 Тип данных, при просмотре продукта
@@ -215,8 +224,8 @@ type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 ```ts
 interface ILarekAPI {
-  getProductList: () => Promise<IProduct[]>
-  orderProducts: (order: IOrder) => Promise<IOrderResult>
+	getProductList: () => Promise<IProduct[]>;
+	orderProducts: (order: IOrder) => Promise<IOrderResult>;
 }
 ```
 
@@ -234,7 +243,7 @@ interface ILarekAPI {
 - getProductList — метод получения списка товаров с сервера
 - orderProducts — метод отправки данных заказа на сервер
 
-#### Класс ProductItem
+#### Класс `ProductItem`
 
 Принимает и хранит в себе данные товара: идентификатор, заголовок, описание, категория, изображение, цена.\
 Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IProduct`.
@@ -247,7 +256,6 @@ interface ILarekAPI {
 - `category` - категория рассматриваемого продукта
 - `image` - изображение описывающее продукт
 - `price` - цена продукта
-
 
 #### Класс AppState
 
@@ -286,6 +294,7 @@ interface ILarekAPI {
 - `_buttonBasket` - отвечает за хранение разметки кнопки корзины
 
 Конструктор:
+
 - принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
@@ -310,6 +319,7 @@ interface ILarekAPI {
 - `_price` - хранит разметку цены карточки
 
 Конструктор:
+
 - принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`.
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
@@ -322,7 +332,6 @@ interface ILarekAPI {
 - `set image` - устанавливает данные изображение
 - `set price` - устанавливает данные цены товара
 
-
 #### Класс CardPreview
 
 Класс отображает превью выбранного товара.\
@@ -334,6 +343,7 @@ interface ILarekAPI {
 - `_description` - хранит разметку описания
 
 Конструктор:
+
 - принимает `container` типа `HTMLElement` и объект `event` типа `IEvent`.
 - передает `container` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
@@ -374,7 +384,7 @@ interface ILarekAPI {
 
 ```ts
 interface IModalData {
-	content:HTMLElement;
+	content: HTMLElement;
 }
 ```
 
@@ -428,8 +438,8 @@ interface IModalData {
 
 ```ts
 interface IForm {
-	errors:string[];
-	valid:boolean;
+	errors: string[];
+	valid: boolean;
 }
 ```
 
@@ -439,6 +449,7 @@ interface IForm {
 - `_submit` - хранит разметку кнопки сабмита
 
 Конструктор:
+
 - принимает `сontainer` с типом HTMLElement и `event` с типом IEvent
 - передает данные в родительский конструктор
 - записывает нужные данные в поля класса
@@ -456,6 +467,7 @@ interface IForm {
 Отвечает за первое модальное окно оплаты заказа, расширяет класс Form<IOrderForm>.
 
 Поля:
+
 - `_buttons` — хранит разметку кнопок формы оплаты
 
 Конструктор:
@@ -495,12 +507,13 @@ interface IForm {
 
 ```ts
 interface ISuccess {
-	total:string | number;
+	total: string | number;
 }
 ```
 
 Поля:
-- `_total` - разметка общей суммы товаров 
+
+- `_total` - разметка общей суммы товаров
 - `_close` - разметка кнопки закрытия окна
 
 Конструктор:
@@ -510,8 +523,8 @@ interface ISuccess {
 - сохраняет необходимые данные в поля класса
 - вешает слушатель на кнопку `_close`
 
-
 Методы:
+
 - `set total` - установка полной стоимости
 
 ### Взаимодействие компонентов (Presenter)

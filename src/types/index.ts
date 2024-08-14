@@ -1,8 +1,8 @@
 export interface IProduct {
-  _id: string;
+  id: string;
   title: string;
   description: string;
-  category: TCategory;
+  category: string;
   image: string;
   price: number | null;
 }
@@ -44,7 +44,7 @@ export type TCategory =
   | 'кнопка'
   | 'хард-скил';
 
-export type TBasketItem = Pick<IProduct, 'title' | 'price'>;
+export type TBasketItem = Pick<IProduct, 'title' | 'price' | 'id'>;
 
 export type TPreviewItem = Pick<
   IProduct,
