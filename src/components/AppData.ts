@@ -20,9 +20,10 @@ export class AppState extends Model<IAppState> {
     this.catalog = catalog;
   }
 
-  setPreview(preview: string) {
-    this.preview = preview;
-  }
+  setPreview(product: IProduct) {
+    this.preview = product.id;
+    this.emitChanges('preview:changed', product);
+}
 
   addProductToBasket(product: IProduct) {
     this.basket.push(product);

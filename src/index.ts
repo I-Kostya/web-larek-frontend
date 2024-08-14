@@ -6,6 +6,11 @@ import { testData } from './utils/constants';
 
 const events = new EventEmitter();
 
+events.onAll((event) => {
+  console.log(event.eventName, event.data);
+})
+
+
 const appData = new AppState({}, events);
 
 appData.setCatalog(testData.items);
@@ -28,6 +33,8 @@ appData.updateOrder();
 
 console.log('данные заказа', appData.order);
 
-appData.setPreview("testString");
+appData.setPreview(testData.items[0]);
 console.log('получили превью', appData.preview);
+
+
 
