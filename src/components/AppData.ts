@@ -22,7 +22,7 @@ export class AppState extends Model<IAppState> {
 
   setPreview(product: IProduct) {
     this.preview = product.id;
-    this.emitChanges('preview:changed', product);
+    this.emitChanges('product:select', product);
 }
 
   addProductToBasket(product: IProduct) {

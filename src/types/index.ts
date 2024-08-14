@@ -11,6 +11,11 @@ export interface IProductsList {
   products: IProduct[];
 }
 
+export interface IGetProductsResponse {
+  total: number;
+  items: IProduct[];
+}
+
 export interface IAppState {
   catalog: IProduct[];
   basket: string[];
