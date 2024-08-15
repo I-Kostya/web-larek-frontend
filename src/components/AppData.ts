@@ -3,17 +3,17 @@ import { IAppState, IOrder, IProduct, TBasketItem } from '../types';
 import { Model } from './base/Model';
 
 export class AppState extends Model<IAppState> {
-	 catalog: IProduct[];
-	 preview: string;
-	 basket: TBasketItem[] = [];
-	 order: IOrder = {
-		payment: '',
-		address: '',
-		email: '',
-		phone: '',
-		total: 0,
-		items: [],
-	};
+  catalog: IProduct[];
+  preview: string;
+  basket: TBasketItem[] = [];
+  order: IOrder = {
+    payment: '',
+    address: '',
+    email: '',
+    phone: '',
+    total: 0,
+    items: [],
+  };
   protected FormErrors: FormErrors = {};
 
   setCatalog(catalog: IProduct[]) {
@@ -23,14 +23,14 @@ export class AppState extends Model<IAppState> {
   setPreview(product: IProduct) {
     this.preview = product.id;
     this.emitChanges('product:select', product);
-}
+  }
 
   addProductToBasket(product: IProduct) {
     this.basket.push(product);
   }
 
   removeProductFromBasket(product: IProduct) {
-    this.basket = this.basket.filter(item => item.id !== product.id);
+    this.basket = this.basket.filter((item) => item.id !== product.id);
   }
 
   clearBasket() {
@@ -60,7 +60,7 @@ export class AppState extends Model<IAppState> {
     this.order.email = value;
   }
 
-  setOrderPhone(value: string) {  
+  setOrderPhone(value: string) {
     this.order.phone = value;
   }
 
@@ -70,12 +70,6 @@ export class AppState extends Model<IAppState> {
 
   updateOrder() {
     this.order.total = this.getTotal();
-    this.order.items = this.basket.map(item => item.id);
+    this.order.items = this.basket.map((item) => item.id);
   }
-
-
-
-
-
-
 }
