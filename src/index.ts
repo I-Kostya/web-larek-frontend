@@ -131,6 +131,7 @@ events.on('order:open', () => {
 
 events.on('payment:changed', (item: HTMLButtonElement) => {
   appData.order.payment = item.name;
+  appData.validateOrder();
 });
 
 events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
