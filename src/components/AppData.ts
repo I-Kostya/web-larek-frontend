@@ -33,6 +33,10 @@ export class AppState extends Model<IAppState> {
     this.basket = this.basket.filter((item) => item.id !== product.id);
   }
 
+  setBasketIndex(item: TBasketItem) {
+    return this.basket.indexOf(item) + 1;
+  }
+
   clearBasket() {
     this.basket = [];
   }
@@ -65,6 +69,7 @@ export class AppState extends Model<IAppState> {
   }
 
   getTotal() {
+    console.log(this.basket.reduce((total, item) => total + item.price, 0))
     return this.basket.reduce((total, item) => total + item.price, 0);
   }
 

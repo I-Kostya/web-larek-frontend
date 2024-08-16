@@ -4,7 +4,7 @@ import { EventEmitter } from './components/base/events';
 import { API_URL, testData } from './utils/constants';
 import { LarekApi } from './components/LarekApi';
 import { Page } from './components/Page';
-import { Card, CardPreview } from './components/Card';
+import { Card, CardBasket, CardPreview } from './components/Card';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/common/Modal';
 import { IProduct } from './types';
@@ -48,7 +48,6 @@ events.on('products:changed', () => {
       onClick: () => events.emit('product:select', item),
     });
     return card.render({
-      id: item.id,
       title: item.title,
       image: item.image,
       category: item.category,
@@ -58,6 +57,17 @@ events.on('products:changed', () => {
 });
 
 events.on('basket:open', () => {
+  basket.total = appData.getTotal();
+  basket.list = appData.basket.map((item) => {
+    const basketCard = new CardBasket(cloneTemplate(cardBasketTemplate), {
+      onClick: () => events.emit('card:remove', item),
+    });
+    return basketCard.render({
+      title: item.title,
+      price: item.price,
+      index: appData.setBasketIndex(item),
+    });
+  });
   modal.render({
     content: basket.render(),
   });
@@ -74,17 +84,21 @@ events.on('preview:changed', (item: IProduct) => {
 
   modal.render({
     content: card.render({
-      id: item.id,
       title: item.title,
       image: item.image,
-      category: item.category,
+      text: item.description,
       price: item.price,
-      description: item.description,
+      category: item.category,
     }),
   });
-
 });
 
+events.on('card:addToBasket', (item: IProduct) => {
+  appData.addProductToBasket(item);
+  appData.updateOrder();
+  page.counter = appData.basket.length;
+  modal.close();
+});
 
 events.on('modal:open', () => {
   page.locked = true;

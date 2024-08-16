@@ -16,7 +16,7 @@ export class Basket extends Component<IBasketView> {
     super(container);
 
     this._list = ensureElement('.basket__list', this.container);
-    this._total = ensureElement('.basket__price');
+    this._total = ensureElement('.basket__price', this.container);
     this._button = ensureElement<HTMLButtonElement>('.basket__button', this.container);
 
     if (this._button) {
@@ -42,6 +42,8 @@ export class Basket extends Component<IBasketView> {
     }
   }
 
-
+  set total(value: number) {
+    this.setText(this._total, `${value} синапсов`);
+}
 
 }
