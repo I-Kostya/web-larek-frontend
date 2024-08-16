@@ -7,8 +7,10 @@ import { Page } from './components/Page';
 import { Card, CardBasket, CardPreview } from './components/Card';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/common/Modal';
-import { IProduct } from './types';
+import { IOrderForm, IProduct } from './types';
 import { Basket } from './components/common/Basket';
+import { Order, Сontacts } from './components/Order';
+import { Success } from './components/common/Success';
 
 // шаблоны
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
@@ -20,12 +22,16 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
 const events = new EventEmitter();
+const api = new LarekApi(API_URL);
 
 const appData = new AppState({}, events);
+
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement('#modal-container'), events);
+
 const basket = new Basket(cloneTemplate(basketTemplate), events);
-const api = new LarekApi(API_URL);
+const order = new Order(cloneTemplate(orderTemplate), events);
+const contacts = new Сontacts(cloneTemplate(contactsTemplate), events);
 
 events.onAll((event) => {
   console.log(event.eventName, event.data);
@@ -119,6 +125,73 @@ events.on('card:removeFromBasket', (item: IProduct) => {
   modal.render({
     content: basket.render(),
   });
+});
+
+events.on('order:open', () => {
+  modal.render({
+    content: order.render({
+      payment: '',
+      address: '',
+      valid: false,
+      errors: []
+    })
+  });
+});
+
+events.on('payment:changed', (item: HTMLButtonElement) => {
+  appData.order.payment = item.name;
+})
+
+events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
+  const { email, phone, address, payment } = errors;
+  order.valid = !address && !payment;
+  contacts.valid = !email && !phone;
+  order.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
+  contacts.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
+});
+
+events.on(/^contacts\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+  appData.setContactsField(data.field, data.value);
+});
+
+// Изменилось одно из полей заказа - сохраняем данные об этом
+events.on(/^order\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+  appData.setOrderField(data.field, data.value);
+});
+
+events.on('order:submit', () => {
+  appData.order.total = appData.getTotal()
+  modal.render({
+    content: contacts.render({
+      email: '',
+      phone: '',
+      valid: false,
+      errors: []
+    })
+  });
+})
+
+events.on('contacts:submit', () => {
+  api.orderProducts(appData.order)
+    .then(() => {
+      console.log(appData.order)
+      const success = new Success(cloneTemplate(successTemplate), {
+        onClick: () => {
+          modal.close();
+          appData.clearBasket();
+          page.counter = appData.basket.length;
+        }
+      });
+    
+      modal.render({
+        content: success.render({
+          total: appData.getTotal()
+        })
+      })
+    })
+    .catch(err => {
+      console.error(err);
+    })
 });
 
 events.on('modal:open', () => {

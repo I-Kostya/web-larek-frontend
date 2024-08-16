@@ -30,7 +30,7 @@ export interface IOrderForm {
   address: string;
   email: string;
   phone: string;
-  total: number;
+  total: string | number;
 }
 
 export interface IOrder extends IOrderForm {

@@ -1,6 +1,6 @@
 import { createElement, ensureElement } from '../../utils/utils';
 import { Component } from '../base/Component';
-import { EventEmitter } from '../base/events';
+import { IEvents } from '../base/events';
 
 interface IBasketView {
   list: HTMLElement[];
@@ -12,12 +12,15 @@ export class Basket extends Component<IBasketView> {
   protected _total: HTMLElement;
   protected _button: HTMLButtonElement;
 
-  constructor(container: HTMLElement, protected events: EventEmitter) {
+  constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
 
-    this._list = ensureElement('.basket__list', this.container);
-    this._total = ensureElement('.basket__price', this.container);
-    this._button = ensureElement<HTMLButtonElement>('.basket__button', this.container);
+    this._list = ensureElement('.basket__list', container);
+    this._total = ensureElement('.basket__price', container);
+    this._button = ensureElement<HTMLButtonElement>(
+      '.basket__button',
+      container
+    );
 
     if (this._button) {
       this._button.addEventListener('click', () => {
@@ -41,11 +44,10 @@ export class Basket extends Component<IBasketView> {
       );
     }
 
-    console.log()
+    console.log();
   }
 
   set total(value: number) {
     this.setText(this._total, `${value} синапсов`);
-}
-
+  }
 }
