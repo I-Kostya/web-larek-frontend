@@ -18,6 +18,7 @@ export class AppState extends Model<IAppState> {
 
   setCatalog(catalog: IProduct[]) {
     this.catalog = catalog;
+    this.emitChanges('catalog:changed', { catalog: this.catalog });
   }
 
   setPreview(product: IProduct) {
@@ -25,12 +26,28 @@ export class AppState extends Model<IAppState> {
     this.emitChanges('preview:changed', product);
   }
 
-  addProductToBasket(product: IProduct) {
+  getPreviewButton(item: IProduct) {
+    if (item.price === null) {
+      return 'unavailable';
+    }
+    else return 'addToBasket';   
+  }
+
+  toggleBasketItem(item: IProduct) {
+    return !this.basket.some((card) => card.id === item.id)
+      ? this.addProductToBasket(item)
+      : this.removeProductFromBasket(item);
+  }
+
+  addProductToBasket(product: TBasketItem) {
     this.basket.push(product);
   }
 
-  removeProductFromBasket(product: IProduct) {
-    this.basket = this.basket.filter((item) => item.id !== product.id);
+  removeProductFromBasket(product: TBasketItem) {
+    const index = this.basket.indexOf(product);
+    if (index >= 0) {
+      this.basket.splice( index, 1 );
+    }
   }
 
   setBasketIndex(item: TBasketItem) {
@@ -69,7 +86,6 @@ export class AppState extends Model<IAppState> {
   }
 
   getTotal() {
-    console.log(this.basket.reduce((total, item) => total + item.price, 0))
     return this.basket.reduce((total, item) => total + item.price, 0);
   }
 

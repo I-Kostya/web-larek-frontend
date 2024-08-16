@@ -15,11 +15,13 @@ enum Categories {
 }
 
 interface ICard {
+  id: string;
   title: string;
   category: string;
   image: string;
   price: number;
   text: string;
+  button?: string;
 }
 
 export class Card extends Component<ICard> {
@@ -72,7 +74,7 @@ export class Card extends Component<ICard> {
 
 export class CardPreview extends Card {
   protected _text: HTMLElement;
-  protected _button: HTMLElement;
+  protected _button: HTMLButtonElement;
   
   constructor(container: HTMLElement, actions?: ICardActions) {
     super(container, actions)
@@ -89,6 +91,17 @@ export class CardPreview extends Card {
 
   set text(value: string) {
     this.setText(this._text, value);
+  }
+
+  set button(value: string) {
+    if(value === 'addToBasket') {
+      this.setText(this._button, 'Добавить в корзину');
+    } else if (value === 'removeFromBasket') {
+      this.setText(this._button, 'Убрать из корзины');
+    } else if (value === `unavailable`) {
+      this.setText(this._button, 'Невозможно приобрести');
+      this._button.disabled = true;
+    }
   }
 }
 

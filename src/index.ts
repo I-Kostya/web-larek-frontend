@@ -35,14 +35,12 @@ api
   .getProductList()
   .then((data) => {
     appData.setCatalog(data);
-    console.log('добавили в каталог', appData.catalog);
-    appData.emitChanges('products:changed', appData.catalog);
   })
   .catch((error) => {
     console.log(error);
   });
 
-events.on('products:changed', () => {
+events.on('catalog:changed', () => {
   page.catalog = appData.catalog.map((item) => {
     const card = new Card(cloneTemplate(cardCatalogTemplate), {
       onClick: () => events.emit('product:select', item),
@@ -56,30 +54,13 @@ events.on('products:changed', () => {
   });
 });
 
-events.on('basket:open', () => {
-  basket.total = appData.getTotal();
-  basket.list = appData.basket.map((item) => {
-    const basketCard = new CardBasket(cloneTemplate(cardBasketTemplate), {
-      onClick: () => events.emit('card:remove', item),
-    });
-    return basketCard.render({
-      title: item.title,
-      price: item.price,
-      index: appData.setBasketIndex(item),
-    });
-  });
-  modal.render({
-    content: basket.render(),
-  });
-});
-
 events.on('product:select', (item: IProduct) => {
   appData.setPreview(item);
 });
 
 events.on('preview:changed', (item: IProduct) => {
   const card = new CardPreview(cloneTemplate(cardPreviewTemplate), {
-    onClick: () => events.emit('card:addToBasket', item),
+    onClick: () => events.emit('product:addToBasket', item),
   });
 
   modal.render({
@@ -89,15 +70,55 @@ events.on('preview:changed', (item: IProduct) => {
       text: item.description,
       price: item.price,
       category: item.category,
+      button: appData.getPreviewButton(item),
     }),
   });
 });
 
-events.on('card:addToBasket', (item: IProduct) => {
+events.on('product:addToBasket', (item: IProduct) => {
   appData.addProductToBasket(item);
   appData.updateOrder();
   page.counter = appData.basket.length;
   modal.close();
+});
+
+events.on('basket:open', () => {
+  basket.total = appData.getTotal();
+  let i = 1;
+  basket.list = appData.basket.map((item) => {
+    const basketCard = new CardBasket(cloneTemplate(cardBasketTemplate), {
+      onClick: () => events.emit('card:removeFromBasket', item),
+    });
+    return basketCard.render({
+      title: item.title,
+      price: item.price,
+      index: i++,
+    });
+  });
+  modal.render({
+    content: basket.render(),
+  });
+});
+
+events.on('card:removeFromBasket', (item: IProduct) => {
+  appData.removeProductFromBasket(item);
+  appData.updateOrder;
+  page.counter = appData.basket.length;
+  basket.total = appData.getTotal();
+  let i = 1;
+  basket.list = appData.basket.map((item) => {
+    const card = new CardBasket(cloneTemplate(cardBasketTemplate), {
+      onClick: () => events.emit('card:removeFromBasket', item),
+    });
+    return card.render({
+      title: item.title,
+      price: item.price,
+      index: i++,
+    });
+  });
+  modal.render({
+    content: basket.render(),
+  });
 });
 
 events.on('modal:open', () => {
