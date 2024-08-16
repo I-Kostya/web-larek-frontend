@@ -102,7 +102,7 @@ events.on('basket:open', () => {
 
 events.on('card:removeFromBasket', (item: IProduct) => {
   appData.removeProductFromBasket(item);
-  appData.updateOrder;
+  appData.updateOrder();
   page.counter = appData.basket.length;
   basket.total = appData.getTotal();
   let i = 1;
