@@ -173,12 +173,12 @@ events.on('contacts:submit', () => {
   api
     .orderProducts(appData.order)
     .then(() => {
+      appData.clearBasket();
+      appData.clearOrder();
+      page.counter = appData.basket.length;
       const success = new Success(cloneTemplate(successTemplate), {
         onClick: () => {
           modal.close();
-          appData.clearBasket();
-          appData.clearOrder();
-          page.counter = appData.basket.length;
         },
       });
 
