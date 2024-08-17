@@ -43,8 +43,6 @@ export class Basket extends Component<IBasketView> {
         })
       );
     }
-
-    console.log();
   }
 
   set total(value: number) {

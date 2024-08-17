@@ -33,10 +33,6 @@ const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
 const contacts = new Сontacts(cloneTemplate(contactsTemplate), events);
 
-events.onAll((event) => {
-  console.log(event.eventName, event.data);
-});
-
 events.on('catalog:changed', () => {
   page.catalog = appData.catalog.map((item) => {
     const card = new Card(cloneTemplate(cardCatalogTemplate), {
@@ -177,7 +173,6 @@ events.on('contacts:submit', () => {
   api
     .orderProducts(appData.order)
     .then(() => {
-      console.log(appData.order);
       const success = new Success(cloneTemplate(successTemplate), {
         onClick: () => {
           modal.close();
