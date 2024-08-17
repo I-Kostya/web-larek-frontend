@@ -11,12 +11,12 @@ interface ISuccessActions {
 
 export class Success extends Component<ISuccess> {
   protected _total: HTMLElement;
-  protected _close: HTMLElement;
+  protected _close: HTMLButtonElement;
 
   constructor(container: HTMLElement, actions: ISuccessActions) {
     super(container);
 
-    this._close = ensureElement<HTMLElement>(
+    this._close = ensureElement<HTMLButtonElement>(
       '.order-success__close',
       this.container
     );

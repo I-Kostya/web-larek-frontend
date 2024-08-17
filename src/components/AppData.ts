@@ -1,4 +1,4 @@
-import { FormErrors, IOrderForm } from './../types/index';
+import { FormErrors, IOrderForm, TPreviewItem } from './../types/index';
 import { IAppState, IOrder, IProduct, TBasketItem } from '../types';
 import { Model } from './base/Model';
 
@@ -21,7 +21,7 @@ export class AppState extends Model<IAppState> {
     this.emitChanges('catalog:changed', { catalog: this.catalog });
   }
 
-  setPreview(product: IProduct) {
+  setPreview(product: TPreviewItem) {
     this.preview = product.id;
     this.emitChanges('preview:changed', product);
   }
@@ -30,12 +30,6 @@ export class AppState extends Model<IAppState> {
     if (item.price === null) {
       return 'unavailable';
     } else return 'addToBasket';
-  }
-
-  toggleBasketItem(item: IProduct) {
-    return !this.basket.some((card) => card.id === item.id)
-      ? this.addProductToBasket(item)
-      : this.removeProductFromBasket(item);
   }
 
   addProductToBasket(product: TBasketItem) {
@@ -47,10 +41,6 @@ export class AppState extends Model<IAppState> {
     if (index >= 0) {
       this.basket.splice(index, 1);
     }
-  }
-
-  setBasketIndex(item: TBasketItem) {
-    return this.basket.indexOf(item) + 1;
   }
 
   clearBasket() {

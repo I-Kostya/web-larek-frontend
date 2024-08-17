@@ -1,7 +1,7 @@
 import './scss/styles.scss';
 import { AppState } from './components/AppData';
 import { EventEmitter } from './components/base/events';
-import { API_URL } from './utils/constants';
+import { API_URL, CDN_URL } from './utils/constants';
 import { LarekApi } from './components/LarekApi';
 import { Page } from './components/Page';
 import { Card, CardBasket, CardPreview } from './components/Card';
@@ -22,7 +22,7 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
 const events = new EventEmitter();
-const api = new LarekApi(API_URL);
+const api = new LarekApi(API_URL, CDN_URL);
 
 const appData = new AppState({}, events);
 
@@ -182,6 +182,7 @@ events.on('contacts:submit', () => {
         onClick: () => {
           modal.close();
           appData.clearBasket();
+          appData.clearOrder();
           page.counter = appData.basket.length;
         },
       });

@@ -12,7 +12,7 @@ export class Page extends Component<IPage> {
   protected _counter: HTMLElement;
   protected _catalog: HTMLElement;
   protected _wrapper: HTMLElement;
-  protected _basket: HTMLElement;
+  protected _buttonBasket: HTMLButtonElement;
 
   constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
@@ -20,9 +20,9 @@ export class Page extends Component<IPage> {
     this._counter = ensureElement('.header__basket-counter');
     this._catalog = ensureElement('.gallery');
     this._wrapper = ensureElement('.page__wrapper');
-    this._basket = ensureElement('.header__basket');
+    this._buttonBasket = ensureElement<HTMLButtonElement>('.header__basket');
 
-    this._basket.addEventListener('click', () => {
+    this._buttonBasket.addEventListener('click', () => {
       this.events.emit('basket:open');
     });
   }

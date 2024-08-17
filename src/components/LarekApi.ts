@@ -1,5 +1,4 @@
 import { IProduct, IOrder, IOrderResult, IGetProductsResponse } from '../types';
-import { CDN_URL } from '../utils/constants';
 import { Api } from './base/api';
 
 interface ILarekAPI {
@@ -8,15 +7,19 @@ interface ILarekAPI {
 }
 
 export class LarekApi extends Api implements ILarekAPI {
-  constructor(baseUrl: string, options?: RequestInit) {
+  readonly cdn: string;
+  
+  constructor(baseUrl: string, cdn: string, options?: RequestInit) {
     super(baseUrl, options);
+
+    this.cdn = cdn;
   }
 
   getProductList(): Promise<IProduct[]> {
     return this.get('/product').then((data: IGetProductsResponse) =>
       data.items.map((item) => ({
         ...item,
-        image: CDN_URL + item.image,
+        image: this.cdn + item.image,
       }))
     );
   }

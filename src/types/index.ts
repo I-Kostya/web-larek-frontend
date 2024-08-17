@@ -7,10 +7,6 @@ export interface IProduct {
   price: number | null;
 }
 
-export interface IProductsList {
-  products: IProduct[];
-}
-
 export interface IGetProductsResponse {
   total: number;
   items: IProduct[];
@@ -53,10 +49,8 @@ export type TBasketItem = Pick<IProduct, 'title' | 'price' | 'id'>;
 
 export type TPreviewItem = Pick<
   IProduct,
-  'title' | 'image' | 'description' | 'price'
+  'title' | 'image' | 'description' | 'price' | 'id'
 >;
-
-export type TPaymentMethod = 'онлайн' | 'при получении';
 
 export type TPaymentForm = Pick<IOrderForm, 'payment' | 'address'>;
 

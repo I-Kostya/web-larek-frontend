@@ -69,7 +69,7 @@ export class CardPreview extends Card {
   protected _button: HTMLButtonElement;
 
   constructor(container: HTMLElement, actions?: ICardActions) {
-    super(container, actions);
+    super(container);
     this._button = container.querySelector(`.card__button`);
     this._text = ensureElement<HTMLElement>(`.card__text`, container);
 
@@ -86,13 +86,11 @@ export class CardPreview extends Card {
   }
 
   set button(value: string) {
-    if (value === 'addToBasket') {
-      this.setText(this._button, 'Добавить в корзину');
-    } else if (value === 'removeFromBasket') {
-      this.setText(this._button, 'Убрать из корзины');
-    } else if (value === `unavailable`) {
+    if (value === `unavailable`) {
       this.setText(this._button, 'Невозможно приобрести');
       this._button.disabled = true;
+    } else {
+      this.setText(this._button, 'Добавить в корзину');
     }
   }
 }

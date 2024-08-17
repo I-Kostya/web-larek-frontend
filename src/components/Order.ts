@@ -1,9 +1,9 @@
-import { IOrderForm } from '../types';
+import { IOrderForm, TContactsForm, TPaymentForm } from '../types';
 import { ensureAllElements } from '../utils/utils';
 import { IEvents } from './base/events';
 import { Form } from './common/Form';
 
-export class Order extends Form<IOrderForm> {
+export class Order extends Form<TPaymentForm> {
   protected _buttons: HTMLButtonElement[];
 
   constructor(container: HTMLFormElement, events: IEvents) {
@@ -34,7 +34,7 @@ export class Order extends Form<IOrderForm> {
   }
 }
 
-export class Сontacts extends Form<IOrderForm> {
+export class Сontacts extends Form<TContactsForm> {
   constructor(container: HTMLFormElement, events: IEvents) {
     super(container, events);
   }

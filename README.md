@@ -51,20 +51,21 @@ yarn build
 
 ```ts
 interface IProduct {
-	_id: string;
-	title: string;
-	description: string;
-	category: string;
-	image: string;
-	price: number | null;
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image: string;
+  price: number | null;
 }
 ```
 
-Список продуктов
+Интерфейс описывает данные, которые приходят с сервера
 
 ```ts
-interface IProductsList {
-	products: IProductItem[];
+interface IGetProductsResponse {
+  total: number;
+  items: IProduct[];
 }
 ```
 
@@ -72,12 +73,12 @@ interface IProductsList {
 
 ```ts
 interface IAppState {
-	catalog: IProduct[];
-	basket: string[];
-	preview: string | null;
-	order: IOrder;
-	total: string | number;
-	loading: boolean;
+  catalog: IProduct[];
+  basket: string[];
+  preview: string | null;
+  order: IOrder;
+  total: string | number;
+  loading: boolean;
 }
 ```
 
@@ -85,11 +86,11 @@ interface IAppState {
 
 ```ts
 interface IOrderForm {
-	payment: string;
-	address: string;
-	email: string;
-	phone: string;
-	total: number;
+  payment: string;
+  address: string;
+  email: string;
+  phone: string;
+  total: string | number;
 }
 ```
 
@@ -97,7 +98,7 @@ interface IOrderForm {
 
 ```ts
 interface IOrder extends IOrderForm {
-	items: string[];
+  items: string[];
 }
 ```
 
@@ -105,7 +106,7 @@ interface IOrder extends IOrderForm {
 
 ```ts
 interface IOrderResult {
-	id: string;
+  id: string;
 }
 ```
 
@@ -113,11 +114,11 @@ interface IOrderResult {
 
 ```ts
 type TCategory =
-	| 'софт-скил'
-	| 'другое'
-	| 'дополнительное'
-	| 'кнопка'
-	| 'хард-скил';
+  | 'софт-скил'
+  | 'другое'
+  | 'дополнительное'
+  | 'кнопка'
+  | 'хард-скил';
 ```
 
 Тип данных, находящихся в корзине
@@ -129,13 +130,7 @@ type TBasketItem = Pick<IProduct, 'title' | 'price' | 'id'>;
 Тип данных, при просмотре продукта
 
 ```ts
-type TPreviewItem = Pick<IProduct, 'title' | 'image' | `description' | 'price'>;
-```
-
-Тип метода оплаты
-
-```ts
-type TPaymentMethod = 'онлайн' | 'при получении';
+type TPreviewItem = Pick<IProduct, 'title' | 'image' | `description' | 'price' | 'id'>;
 ```
 
 Тип формы оплаты
@@ -187,7 +182,7 @@ type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 Методы:
 
-- `emmitChanges` — регистрирует входящее событие в EventEmitter
+- `emitChanges` — регистрирует входящее событие в EventEmitter
 
 #### Класс Component
 
@@ -224,8 +219,8 @@ type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 ```ts
 interface ILarekAPI {
-	getProductList: () => Promise<IProduct[]>;
-	orderProducts: (order: IOrder) => Promise<IOrderResult>;
+  getProductList: () => Promise<IProduct[]>;
+  orderProducts: (order: IOrder) => Promise<IOrderResult>;
 }
 ```
 
@@ -243,7 +238,7 @@ interface ILarekAPI {
 - getProductList — метод получения списка товаров с сервера
 - orderProducts — метод отправки данных заказа на сервер
 
-#### Класс `ProductItem`
+<!-- #### Класс `ProductItem`
 
 Принимает и хранит в себе данные товара: идентификатор, заголовок, описание, категория, изображение, цена.\
 Расширяет базовый абстрактный класс `Model<T>` по интерфейсу `IProduct`.
@@ -255,7 +250,7 @@ interface ILarekAPI {
 - `description` - описание продукта
 - `category` - категория рассматриваемого продукта
 - `image` - изображение описывающее продукт
-- `price` - цена продукта
+- `price` - цена продукта -->
 
 #### Класс AppState
 
@@ -264,19 +259,27 @@ interface ILarekAPI {
 
 Поля класса:
 
-- `_catalog` - для данных списка товаров
-- `_basket` - для данных корзины покупок
-- `_order` - для данных заказа, который отправляется на сервер
+- `catalog` - для данных списка товаров
+- `preview` - для данных предпросмотра товара
+- `basket` - для данных корзины покупок
+- `order` - для данных заказа, который отправляется на сервер
+- `formErrors` - для данных ошибок формы
 
 Методы:
 
-- `clearBasket` - очистить данные корзины
+- `setCatalog` - установить каталог товаров
+- `setPreview`- установить выбранный продукт в предпросмотр
+- `getPreviewButton` - получение состояния кнопки
 - `addProductToBusket` - добавить продукт в корзину
 - `removeProductFromBusket` - убрать один продукт из корзины
+- `clearBasket` - очистить данные корзины
+- `clearOrder` - очистить данные заказа
 - `get total` - получить финальную сумму заказа
-- `get basket` - получить данные из корзины
-- `validateOrderAddress` - провести валидацию данных адреса заказа
-- `validateOrderContacts` - провести валидацию данных контактов заказа
+- `updateOrder` - обновить данные заказа
+- `setOrderField` - устанавливает данные в форму заказа
+- `setContactsField` - устанавливает данные в форму контактов
+- `validateOrder` - провести валидацию формы заказа
+- `validateContacts` - провести валидацию формы контактов
 
 ### Слой представления
 
@@ -285,12 +288,21 @@ interface ILarekAPI {
 #### Класс Page
 
 Класс отвечает за отображение всех элементов страницы: корзины, счетчика корзины, каталога товаров.\
-Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IProductsList`.
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IPage`.
+
+```ts
+interface IPage {
+  counter: number;
+  catalog: number;
+  locked: boolean;
+}
+```
 
 Поля класса:
 
 - `_counter` - отвечает за счетчик корзины
 - `_catalog` - отвечает за хранение разметки каталога карточек
+- `_wrapper` - отвечает за хранение разметки обёртки страницы
 - `_buttonBasket` - отвечает за хранение разметки кнопки корзины
 
 Конструктор:
@@ -302,14 +314,26 @@ interface ILarekAPI {
 
 Методы класса:
 
-- `set counter` - отвечает за установку счетчика
 - `set catalog` - отвечает за установку каталога
+- `set counter` - отвечает за установку счетчика
 - `set isLocked` - отвечает за блокироку прокрутки страницы
 
 #### Класс Card
 
 Класс отвечает за отображение данных карточки товара в каталоге.\
-Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `IProduct`.
+Расширяет базовый абстрактный класс `Component<T>` по интерфейсу `ICard`.
+
+```ts
+interface ICard {
+  id: string;
+  title: string;
+  category: string;
+  image: string;
+  price: number;
+  text: string;
+  button?: string;
+}
+```
 
 Поля:
 
@@ -335,12 +359,12 @@ interface ILarekAPI {
 #### Класс CardPreview
 
 Класс отображает превью выбранного товара.\
-Расширяет базовый абстрактный класс `Component<T>` по типу `TPreviewItem`.
+Расширяет класс `Card`.
 
 Поля:
 
+- `_text` - хранит разметку описания
 - `_button` - хранит разметку кнопки "В корзину"
-- `_description` - хранит разметку описания
 
 Конструктор:
 
@@ -351,18 +375,28 @@ interface ILarekAPI {
 
 Методы:
 
-- `set description` - установка содержимого описания
+- `set text` - установка содержимого описания
+- `set button`- установка содержимого кнопки
 
 #### Класс CardBasket
 
 Класс отвечает за отображение данных товара в корзине.\
-Расширяет базовый абстрактный класс `Component<T>` по типу `TBasketItem`.
+Расширяет базовый абстрактный класс `Component<T>` по типу `ICardBasket`.
+
+```ts
+interface ICardBasket {
+  title: string;
+  price: number;
+  index: number;
+}
+```
 
 Поля:
 
 - `_title` - хранит разметку названия товара
 - `_price` - хранит разметку цены товара
 - `_button` - хранит разметку кнопки товара
+- `_index` - хранит разметку индекса товара
 
 Конструктор:
 
@@ -384,19 +418,19 @@ interface ILarekAPI {
 
 ```ts
 interface IModalData {
-	content: HTMLElement;
+  content: HTMLElement;
 }
 ```
 
 Поля:
 
-- `_content` - отвечает за храненеие разметки контейнера модального окна
-- `_buttonClose` - отвечает за хранение кнопки закрытия модального окна
+- `_content` - отвечает за храненеие разметки контента модального окна
+- `_closeButton` - отвечает за хранение кнопки закрытия модального окна
 
 Конструктор:
 
 - принимает `сontainer` с типом HTMLElement и `event` с типом IEvent
-- передает данные в родительский конструктор
+- передает `container` в родительский конструктор
 - записывает нужные данные в поля класса
 - вешает слушатель клика
 
@@ -410,26 +444,32 @@ interface IModalData {
 #### Класс Basket
 
 Класс отвечает за отображение корзины: кнопки сабмита, полной стоимости.\
-Расширяет базовый абстрактный класс `Component<T>` по типу `TBasketItem`.
+Расширяет базовый абстрактный класс `Component<T>` по типу `IBasketView`.
+
+```ts
+interface IBasketView {
+  list: HTMLElement[];
+  total: number;
+}
+```
 
 Поля:
 
-- `_total` - хранит разметку обертки полной стоимости
-- `submitButton` - хранит разметку кнопки
 - `_list` - хранит разметку листа карточек (товаров)
-- `items` - хранит список товаров
+- `_total` - хранит разметку обертки полной стоимости
+- `_button` - хранит разметку кнопки "оформить"
 
 Конструктор:
 
 - принимает `container` типа HTMLElement и `event` типа IEvent
 - записывает данные в поля
-- передает данные в родительский класс (конструктор)
+- передает `container` в родительский класс (конструктор)
 - вешает слушатель на кнопку сабмита
 
 Методы:
 
+- `set list` - устанавливает карточки в разметку
 - `set total` - устанавливает финальную сумму
-- `set items` - устанавливает карточки в разметку `_list`
 
 #### Класс Form
 
@@ -438,8 +478,8 @@ interface IModalData {
 
 ```ts
 interface IForm {
-	errors: string[];
-	valid: boolean;
+  errors: string[];
+  valid: boolean;
 }
 ```
 
@@ -451,20 +491,20 @@ interface IForm {
 Конструктор:
 
 - принимает `сontainer` с типом HTMLElement и `event` с типом IEvent
-- передает данные в родительский конструктор
+- передает `container` в родительский конструктор
 - записывает нужные данные в поля класса
 - добавляет слушатели на сабмит и инпуты
 
 Методы:
 
-- `render` - отрисовывает форму
-- `inputChange` - фиксирует изменения в инпутах
+- `onInputChange` - фиксирует изменения в инпутах
 - `set valid` - устанавливает валидность формы
 - `set errors` - устанавливает ошибки
+- `render` - отрисовывает форму
 
-#### Класс OrderAddress
+#### Класс Order
 
-Отвечает за первое модальное окно оплаты заказа, расширяет класс Form<IOrderForm>.
+Отвечает за первое модальное окно оплаты заказа, расширяет класс Form<TPaymentForm>.
 
 Поля:
 
@@ -473,32 +513,28 @@ interface IForm {
 Конструктор:
 
 - принимает `container:HTMLElement` и объект `event:IEvent`
-- передает данные в родительский конструктор
+- передает `container`, `events` в родительский конструктор
 - сохраняет необходимые элементы разметки в полях
 - вешает слушатель клика
 
 Методы
 
-- `set payment` — устанавливает класс активности на кнопку
+- `set payment` — устанавливает класс активности на кнопку типа оплаты
 - `set address` — устанавливает значение поля адрес
 
-#### Класс OrderContacts
+#### Класс Contacts
 
-Отвечает за второе модальное окно оплаты заказа, расширяет класс Form<IOrderForm>.
-
-Поля:
-
-- `_button` - хранит разметку кнопки формы
+Отвечает за второе модальное окно оплаты заказа, расширяет класс Form<TContactsForm>.
 
 Конструктор:
 
 - принимает `container:HTMLElement` и объект `event:IEvent`
-- передает данные в родительский конструктор
+- ередает `container`, `events` в родительский конструктор
 
 Методы:
 
-- `set phone` - устанавливает значение инпута телефона
 - `set email` - устанавливает значение инпута почты
+- `set phone` - устанавливает значение инпута телефона
 
 #### Класс Success
 
@@ -507,7 +543,7 @@ interface IForm {
 
 ```ts
 interface ISuccess {
-	total: string | number;
+  total: number;
 }
 ```
 
@@ -519,7 +555,7 @@ interface ISuccess {
 Конструктор:
 
 - принимает `container:HTMLElement` и `actions:ISuccessActions`.
-- передает данные в родительский конструктор
+- передает `container` в родительский конструктор
 - сохраняет необходимые данные в поля класса
 - вешает слушатель на кнопку `_close`
 
@@ -534,27 +570,19 @@ interface ISuccess {
 В index.ts сначала создаются экземпляры событий, генерируемых с помощью брокера событий и обработчиков этих событий, описанных в index.ts\
 
 Список всех событий, генерируемых в системе:
-События изменения данных (генерируются классами моделями данных)
 
+- `catalog:changed` - изменение массива товаров
 - `product:select` - изменение открываемого в модальном окне товара
-- `products:changed` - изменение массива товаров
-- `items:changed` - изменение массива товаров в корзине
-
-События, возникающие при взаимодействии пользователя с интерфейсом:
-
 - `product:addToBasket` - добавление товара в корзину
-- `basket:submit` - подтверждение товаров в корзине
 - `basket:open` - открытие корзины
-- `basket:changed` - изменение количества товаров в корзине
-- `modal:open` - изменение контента модального окна
-- `modal:changed` - изменение контента модального окна
+- `modal:open` - открытие модального окна
+- `modal:close` - закрытие модального окна
 - `product:select` - выбор товара для просмотра в модальном окне
-- `product:previewChange` - необходима очистка данных выбранного для показа в модальном окне товара
-- `order:input` - изменение данных в форме с информацией заказа
+- `preview:changed` - изменение данных товара для показа в модальном окне предпросмотра
+- `order:open` - подтверждение товаров в корзине
+- `order:change` - изменение данных в форме с информацией заказа
 - `contacts:input` - изменение данных в форме с контактами пользователя
 - `order:submit` - сохранение данных о заказе в форме
 - `contacts:submit` - сохранение данных о контактах пользователя в форме
-- `order:validated` - событие после выполнения валидации формы заказа
-- `contacts:validated` - событие после выполнения валидации формы контактов пользователя
-- `order:completed` - завершение оформления заказа
-- `contacts:completed` - завершение оформления заказа (контакты)
+- `order:ready` - событие после выполнения валидации формы заказа
+- `contacts:ready` - событие после выполнения валидации формы контактов пользователя
